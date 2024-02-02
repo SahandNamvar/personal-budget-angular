@@ -1,30 +1,41 @@
 // NodeJS
+const express = require('express');
+const app = express();
+const port = 3000;
+const fs = require('fs');
 
-const express = require('express'); //request express
-const app = express(); // initiate an express app
-const port = 3000; // define port
+// Function to read budget data from the JSON file
+function readBudgetData() {
+    try {
+        const data = fs.readFileSync('budget_data.json', 'utf8');
+        return JSON.parse(data);
+    } catch (error) {
+        console.error('Error reading budget data:', error);
+        return null;
+    }
+}
 
-// define the route to the static content located inside public folder
-app.use('/', express.static('public'))
+// Route to serve static content located inside the public folder
+app.use('/', express.static('public'));
 
-const budget = {myBudget: [
-    {title: 'Eat out', budget: 90},
-    {title: 'Rent', budget: 2800},
-    {title: 'Groceries', budget: 450},
-]};
-
-// define a route to /hello --> send html
+// Route to send HTML response for /hello
 app.get('/hello', (req, res) => {
-    res.send('Hello World from Node JS')
+    res.send('Hello World from Node JS');
 });
 
-// define a new route to /budget --> send json object (budget)
+// Route to send JSON response (budget data) for /budget
 app.get('/budget', (req, res) => {
-    res.json(budget);
+    const budgetData = readBudgetData();
+
+    if (budgetData) {
+        res.json(budgetData);
+    } else {
+        // Send an error response if reading data fails
+        res.status(500).send('Internal Server Error');
+    }
 });
 
-
-// serve the route
+// Serve the route
 app.listen(port, () => {
-    console.log('Example app listening at http://localhost:', port)
+    console.log('Example app listening at http://localhost:', port);
 });
