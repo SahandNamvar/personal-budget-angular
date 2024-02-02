@@ -1,4 +1,5 @@
 #!/bin/sh
+# Shell script
 
 yum install epel-release yum-utils -y
 yum install nginx -y
