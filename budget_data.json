@@ -1,15 +1,15 @@
 {
     "myBudget": [
-      { "title": "Eat out", "budget": 35 },
-      { "title": "Rent", "budget": 800 },
+      { "title": "Dining", "budget": 40 },
+      { "title": "Rent", "budget": 450 },
       { "title": "Grocery", "budget": 120 },
       { "title": "Transportation", "budget": 50 },
       { "title": "Utilities", "budget": 80 },
-      { "title": "Medical/Healthcare", "budget": 100 },
+      { "title": "Medical", "budget": 100 },
       { "title": "Insurance", "budget": 95 },
       { "title": "Personal", "budget": 40 },
-      { "title": "Education", "budget": 20 },
-      { "title": "Entertainment", "budget": 25 }
+      { "title": "Education", "budget": 35 },
+      { "title": "Entertainment", "budget": 30 }
     ]
   }
   

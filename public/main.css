@@ -91,6 +91,36 @@ footer.bottom {
     margin: 20px;
 }
 
+.container article.graph-box {
+    display: inline-block;
+    width: 100%;
+    max-width: 400px;
+    text-align: justify;
+    margin: 20px;
+}
+
+#donutChart {
+    position: relative;
+}
+
+#center-text {
+    font-size: 1.6em;
+    color: #852dbf;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+
+h1 {
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
 @media screen and (min-width: 768px) {
     .container .article.text-box {
         margin: 10px;
