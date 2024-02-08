@@ -176,8 +176,8 @@
                 });
         }
         // Function to navigate to the Route defined in server.js (/budget) using Axios, get a response (the json object budget)
-        function getBudget() {
-            axios.get('/budget') // access the /budget route defined in the server.js through the axios api, get a response back, manipulate the dataSource here with the budget object value from the server.
+        function getBudget() { // Axios: Used for making HTTP requests.
+            axios.get('http://localhost:3000/budget') // access the /budget route defined in the server.js through the axios api, get a response back, manipulate the dataSource here with the budget object value from the server.
             .then(function (res) {
                 console.log("Response from axios.get()", res.data);
                 for (var i = 0; i < res.data.myBudget.length; i++) {

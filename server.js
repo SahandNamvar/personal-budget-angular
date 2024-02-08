@@ -1,8 +1,13 @@
 // NodeJS
-const express = require('express');
+const express = require('express'); // Import Express
 const app = express();
 const port = 3000;
 const fs = require('fs');
+const cors = require('cors'); // Import CORS middleware
+
+// Use CORS middleware
+app.use(cors());
+app.use(cors({ origin: '*' }));
 
 // Function to read budget data from the JSON file
 function readBudgetData() {
@@ -16,12 +21,12 @@ function readBudgetData() {
 }
 
 // Route to serve static content located inside the public folder
-app.use('/', express.static('public'));
+// app.use('/', express.static('public'));
 
 // Route to send HTML response for /hello
-app.get('/hello', (req, res) => {
-    res.send('Hello World from Node JS');
-});
+// app.get('/hello', (req, res) => {
+//     res.send('Hello World from Node JS');
+// });
 
 // Route to send JSON response (budget data) for /budget
 app.get('/budget', (req, res) => {
