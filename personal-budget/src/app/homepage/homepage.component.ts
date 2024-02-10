@@ -1,66 +1,68 @@
-import { Component, AfterViewInit } from '@angular/core'; // Import Component and AfterViewInit from '@angular/core' module
-import { HttpClient } from '@angular/common/http'; // Import HttpClient from '@angular/common/http' module
-import { Chart } from 'chart.js'; // Import Chart from 'chart.js' library
+import { Component, AfterViewInit } from '@angular/core'; // Import Component and AfterViewInit from Angular core module
+import { Chart } from 'chart.js'; // Import Chart class from Chart.js library
+import * as d3 from 'd3'; // Import d3 library
+import { DataService } from '../data.service'; // Import DataService
 
-@Component({ // Decorator that marks a class as an Angular component
-  selector: 'app-homepage', // Selector that identifies the component when used in templates
-  templateUrl: './homepage.component.html', // URL of the HTML template file for the component
-  styleUrls: ['./homepage.component.scss'] // Array of URLs of CSS style files to apply to the component's template
+@Component({
+  selector: 'app-homepage', // Selector for the component
+  templateUrl: './homepage.component.html', // Template URL for the component
+  styleUrls: ['./homepage.component.scss'] // Style URLs for the component
 })
-export class HomepageComponent implements AfterViewInit { // Define HomepageComponent class that implements AfterViewInit lifecycle hook
+export class HomepageComponent implements AfterViewInit { // Define HomepageComponent class implementing AfterViewInit lifecycle hook
 
-  chart: Chart | null = null; // Declare a property 'chart' of type Chart or null and initialize it to null
+  chart: Chart | null = null; // Declare chart property with Chart or null type
+  dataSource: any; // Declare dataSource property with any type
 
-  public dataSource = { // Define 'dataSource' object to hold chart data
-    datasets: [ // Array of datasets for the chart
-      {
-        data: [0], // Array of data points for the dataset, initialized with a single value (0)
-        backgroundColor: [ // Array of background colors for the data points
-          '#2020d4',
-          '#23d420',
-          '#d42020',
-          '#cbd420',
-          '#7720d4',
-          '#ce20d4',
-          '#20d49e',
-          '#20d4bf',
-          '#d42089',
-          '#d4b020'
-        ],
-      }
-    ],
-    labels: [''] // Array of labels for the data points, initialized with an empty string
-  };
-
-  constructor(private http: HttpClient) {
-    const checkingCanvas = document.getElementById('myChart'); // Error Checking if myChart is activated. (It shouldn't be at this stage in the lifecycle)
-    console.log("Is myChart ready?", checkingCanvas);
-  } // Constructor function that injects HttpClient service
+  constructor(private dataService: DataService) {} // Constructor function to inject DataService
 
   ngAfterViewInit(): void { // Implementation of AfterViewInit lifecycle hook
-    const checkingCanvas = document.getElementById('myChart'); // Error Checking if myChart is activated. (It SHOULD be at this stage in the lifecycle)
-    console.log("Is myChart ready?", checkingCanvas);
-    this.http.get('http://localhost:3000/budget') // Make an HTTP GET request to 'http://localhost:3000/budget'
-    .subscribe((res: any) => { // Subscribe to the Observable returned by the HTTP request
-      console.log(res); // Log the response data to the console
-      for (var i = 0; i < res.myBudget.length; i++) { // Iterate over the 'myBudget' array in the response
-        this.dataSource.datasets[0].data[i] = res.myBudget[i].budget; // Assign budget value to the corresponding data point
-        this.dataSource.labels[i] = res.myBudget[i].title; // Assign title to the corresponding label
-      }
-      this.createChart(); // Call the createChart method to create the chart
+    this.dataService.fetchData().subscribe((res: any) => { // Call fetchData method of DataService to fetch data
+      this.dataSource = this.dataService.processChartData(res); // Process fetched data using processChartData method of DataService
+      this.createChart(); // Call createChart method to create Chart.js chart
+      this.createD3DonutChart(); // Call createD3DonutChart method to create D3.js chart
+    });
+    this.dataService.dataSourceUpdated.subscribe((updatedData: any) => {
+      console.log('dataSource updated:', updatedData);
     });
   }
 
-  createChart(): void { // Method to create the chart
-    const ctx = document.getElementById('myChart') as HTMLCanvasElement | null; // Get the canvas element with id 'myChart'
-    if (ctx) { // Check if the canvas element is found
-      this.chart = new Chart(ctx, { // Create a new Chart instance with the canvas context
-        type: 'pie', // Set the type of chart to 'pie'
-        data: this.dataSource // Set the data for the chart from the dataSource object
+  createChart(): void { // Method to create Chart.js chart
+    const ctx = document.getElementById('myChart') as HTMLCanvasElement | null; // Get canvas element for chart
+    if (ctx) { // Check if canvas element exists
+      this.chart = new Chart(ctx, { // Create new Chart.js instance
+        type: 'pie', // Set chart type to pie
+        data: this.dataSource // Set chart data to dataSource
       });
-    } else { // If the canvas element is not found
-      console.error("Canvas element with id 'myChart' not found."); // Log an error message to the console
+    } else { // If canvas element does not exist
+      console.error("Canvas element with id 'myChart' not found."); // Log error message
     }
   }
 
+  createD3DonutChart(): void { // Method to create D3.js chart
+    const width = 400; // Define width of chart
+    const height = 400; // Define height of chart
+    const radius = Math.min(width, height) / 2; // Calculate radius of chart
+
+    const svg = d3.select('#d3DonutChart') // Select SVG element for chart
+      .append('svg') // Append SVG element
+      .attr('width', width) // Set width attribute
+      .attr('height', height) // Set height attribute
+      .append('g') // Append 'g' element
+      .attr('transform', `translate(${width / 2},${height / 2})`); // Set transform attribute
+
+    const arc = d3.arc() // Define arc generator
+      .innerRadius(radius * 0.5) // Set inner radius
+      .outerRadius(radius * 0.8); // Set outer radius
+
+    const pie = d3.pie() // Define pie generator
+      .sort(null) // Disable sorting
+      .value((d: any) => d); // Set value accessor
+
+    const paths = svg.selectAll('path') // Select all path elements
+      .data(pie(this.dataSource.datasets[0].data)) // Bind data to paths
+      .enter() // Enter selection
+      .append('path') // Append path elements
+      .attr('d', (d: any) => arc(d) as string) // Set 'd' attribute using arc generator
+      .attr('fill', (d: any, i: number) => this.dataSource.datasets[0].backgroundColor[i]); // Set 'fill' attribute
+  }
 }
